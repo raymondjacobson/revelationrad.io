@@ -1,6 +1,18 @@
 Revelradio::Application.routes.draw do
+  get "pages/home"
+
+  get "pages/about"
+
+  get "pages/terms"
+
+  root to: 'pages#home'
+  match '/about', to: 'pages#about'
+  match '/terms', to: 'pages#terms'
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
+
+
 
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
