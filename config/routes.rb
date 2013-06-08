@@ -1,4 +1,8 @@
 Revelradio::Application.routes.draw do
+  get "streams/new"
+
+  get "streams/show"
+
   get "pages/home"
 
   get "pages/about"
