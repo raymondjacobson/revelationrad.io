@@ -15,6 +15,8 @@ class StreamsController < ApplicationController
 
   def show
   	@stream = Stream.where(:name => params[:words]).first
+    @songs = @stream.songs
+    @song = @songs.build
   end
 
   def destroy

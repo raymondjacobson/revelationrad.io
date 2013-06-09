@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
   	@streams = Stream
   end
 
+  def stream_owns_song
+  	@stream = Stream.find(params[:stream_id] || params[:id])
+  end
+
 	def get_unique_name(id, streams)
 		r = Random.new
 		nine_digit = r.rand(0..1000000000).to_s
