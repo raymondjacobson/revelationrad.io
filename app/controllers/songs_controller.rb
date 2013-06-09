@@ -21,7 +21,7 @@ class SongsController < ApplicationController
 
   def pull_info
     #@song = @stream.songs.find(params[:id])
-    @song_info = getSongData("https://dermis.s3.amazonaws.com/play.mp3?AWSAccessKeyId=AKIAIVB4FWYTLOXMCDYA&Expires=1370778793&Signature=U4%2BM8r5lGSXyQ25MweTuCJzcoKs%3D")
+    @song_info = getSongData("https://s3.amazonaws.com/bouncy-clammy-popcorn/08+Get+Lucky+%28feat.+Pharrell+Williams%29.mp3")
     render :json => @song_info
   end
 
