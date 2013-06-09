@@ -7,6 +7,8 @@ class StreamsController < ApplicationController
   	@stream = Stream.new(params[:stream])
   	@stream.name = get_unique_name(@stream.id, Stream.all)
   	if @stream.save
+      cookies.delete :dj
+      cookies[:dj] = @stream.id
   		redirect_to ('/' + @stream.name)
   	else
   		render 'new'

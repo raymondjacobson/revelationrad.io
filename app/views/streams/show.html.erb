@@ -35,9 +35,11 @@
 		console.log(song_links[0]);
 	<% end %>
 </div>
-<div id="upload_box">
-	<%= render 'songs/form' %>
-</div>
+<% if cookies[:dj] %>
+	<div id="upload_box">
+		<%= render 'songs/form' %>
+	</div>
+<% end %>
 
 
 <script type="text/javascript">
