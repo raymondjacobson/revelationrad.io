@@ -9,9 +9,15 @@ Revelradio::Application.routes.draw do
 
   get "pages/terms"
 
-  root to: 'pages#home'
+  root to: 'streams#new'
   match '/about', to: 'pages#about'
   match '/terms', to: 'pages#terms'
+
+  resources :streams do
+    resources :songs
+  end
+
+  get '/*words' => 'streams#show'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

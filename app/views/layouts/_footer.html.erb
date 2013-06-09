@@ -1,0 +1,26 @@
+<footer>
+   	<div id="" class='row'>
+   	<div class="col_3">
+   		<p>//Things to see</p>
+    	<%= link_to "home", "/" %>
+			<%= link_to "about" ,"/about" %>
+			<%= link_to "terms" ,"/terms" %>
+		</div>
+		<div class="col_3">
+			<p>//Latest streams made</p>
+			<% streams = get_recent_streams(3, @streams) %>
+			<% streams.each do |name| %>
+				<%= link_to name, make_link_with_name(name) %>
+			<% end %>
+		</div>
+		<div class="col_3">
+			<p>//Streams with lots of listeners</p>
+			<%= link_to "station blah", "/" %>
+			<%= link_to "stupid other station" ,"/about" %>
+			<%= link_to "third fucking station" ,"/terms" %>
+		</div>
+		<div class="right">
+			<p>By Raymond Jacobson and Seth Drew<p>
+			<p>at AngelHack Washington, D.C. 2013</p>
+		</div>
+</footer>

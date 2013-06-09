@@ -1,0 +1,20 @@
+# == Schema Information
+#
+# Table name: streams
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  last_used  :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  last_used: 2013-06-08 12:52:58
+
+two:
+  name: MyString
+  last_used: 2013-06-08 12:52:58
