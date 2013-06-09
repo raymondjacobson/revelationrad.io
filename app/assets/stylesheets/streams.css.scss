@@ -23,15 +23,22 @@ img.album_art {
 	border: 3px dashed #ccc;
 	border-radius: 2px;
 	height: 100px;
-	p {
-		padding: 40px;
-		text-align:center;
-		color: #999;
+	padding: 40px;
+	text-align:center;
+	color: #999;
+	span {
+		font-size: 1em;
+	}
+	input {
+		display:none;
+	}
+	.dz-preview {
+		display:none;
 	}
 }
 #upload_box:hover {
 	border-color: #ddd;
-	p {
+	span {
 		color: #ddd;
 	}
 }

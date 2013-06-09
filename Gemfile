@@ -25,6 +25,9 @@ group :assets do
 end
 
 gem 'jquery-rails'
+gem "paperclip", "~> 3.0"
+gem "rest-client", "~> 1.6.7"
+gem "faraday", "~> 0.8.7"
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

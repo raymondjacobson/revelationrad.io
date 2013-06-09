@@ -5,6 +5,8 @@ Revelradio::Application.routes.draw do
 
   get "streams/show"
 
+  match '/update_time', to: 'streams#update_time'
+
   get "pages/home"
 
   get "pages/about"
