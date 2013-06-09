@@ -25,11 +25,12 @@ class StreamsController < ApplicationController
   	redirect_to root_path
   end
 
-  def update_time
+  def time
     @stream = Stream.find(params[:id])
-    time = params[:time]
-    @stream.current_song_time = time
-    render :json => { }
+    @time = params[:current_song_time]
+    @stream.current_song_time = @time
+    @stream.save
+    render :json => @stream.current_song_time
   end
 
 end

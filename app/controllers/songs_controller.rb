@@ -19,4 +19,10 @@ class SongsController < ApplicationController
     redirect_to :back
   end
 
+  def pull_info
+    #@song = @stream.songs.find(params[:id])
+    @song_info = getSongData("https://dermis.s3.amazonaws.com/play.mp3?AWSAccessKeyId=AKIAIVB4FWYTLOXMCDYA&Expires=1370778793&Signature=U4%2BM8r5lGSXyQ25MweTuCJzcoKs%3D")
+    render :json => @song_info
+  end
+
 end

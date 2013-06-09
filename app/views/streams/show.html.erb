@@ -1,15 +1,16 @@
 <div id="album_info">
 	<h3>Now Playing:</h3>
-	<img class="album_art" src="http://2.bp.blogspot.com/-8iOMD241Ypo/Tjve9ESye7I/AAAAAAAAEIg/VUwqNiWcR9w/s1600/The+Shins+-+Oh%252C+Inverted+World+-+2001.jpg"/>
-	<p>Girl Inform Me</p>
-	<p>The Shins</p>
+	<%= image_tag '/assets/record.png', :id=>"song_artwork", :class=>"album_art" %>
+	<p id="track">Finding track...</p>
+	<p id="artist">Finding artist...</p>
 	<%= javascript_tag do %>
 		song_links = new Array();
 		song_ids = new Array();
 	<% end %>
 	<% @songs.each do |song| %>
 	 	<% if song.music_file.url != '/music_files/original/missing.png' %>
-			<p><%= song.music_file_file_name %> - <%= link_to "Drop", stream_song_path(@stream,song), method: :delete %></p>
+	 	<div class="dev">
+			<p><%= song.music_file_file_name %> - <%= link_to "Drop", stream_song_path(@stream,song), method: :delete, :id => song.id %></p>
 			<audio id='song_<%=song.id %>' src=<%= song.music_file.url %> controls>
 			<p>If you are reading this, it is because your browser does not support the audio element.</p>
 			</audio>
@@ -19,8 +20,14 @@
 				song_ids.push("<%=song.id%>");
 				$('#song_<%=song.id%>').bind('ended', function(){
 			    $('#song_<%=song.id+1%>').get(0).play();
+			    song_ids.splice(0, 1);
+			    $.ajax ({
+			    	type: "DELETE",
+			    	url: "<%=stream_song_path(@stream, song)%>"
+			  	});
 				});
 			<% end %>
+			</div>
 		<% end %>
 	<% end %>
 	<%= javascript_tag do %>
@@ -38,12 +45,23 @@
   	beginner = '#song_';
   	grab_id = beginner + song_ids[0];
 		$(grab_id).bind('canplay', function(){
-			$(this).get(0).currentTime=45;
+			$(this).get(0).currentTime="<%=@stream.current_song_time%>";
 		});
   	$(grab_id).get(0).play();
-  	//update_current_time(grab_id);
+  	console.log('go!');
+  	console.log(song_ids[0]);
+
+  	$.post("/songs/pull", { id: song_ids[0] })
+  	.done(function(data) {
+  		console.log(data);
+  		$('#track').text(data['title']);
+  		$('#artist').text(data['artists']);
+  		$('#song_artwork').attr("src",data['release_image']);
+  	});
+
   	var int=self.setInterval(function(){
-  		update_current_time(grab_id, song_ids[0])}, 1000);
+  		console.log(song_ids);
+  		update_current_time(beginner+song_ids[0], "<%=@stream.id%>")}, 1000);
   });
 	function update_song_list(){
 		song_links.length = 0;
@@ -55,17 +73,14 @@
 		return song_links;
 	}
 
-	function update_current_time(grab_id, id_r){
+	function update_current_time(grab_id, id_s){
 		time_r = $(grab_id).get(0).currentTime;
-		$.ajax({
-		  type: "POST",
-		  url: "/update_time",
-		  data: {time: time_r, id: id_r},
-		  success: null
+		console.log($(grab_id).get(0).currentTime);
+		$.post("/streams/time", { id: id_s, current_song_time: time_r })
+		.done(function(data) {
+			console.log(data);
 		});
 		
-		console.log("<%= @stream.current_song_time %>"+ "asdf");
-		console.log($(grab_id).get(0).currentTime);
 	}
 	
 	function play_next_song(id){

@@ -171,6 +171,10 @@ h2.heading {
   margin-top: 300px;
 }
 
+.dev {
+  /*display: none;*/
+}
+
 /* 6. CUSTOM LAYOUT & TYPOGRAPHY (Baby bear)
 ----------------------------------------------------------------------------------------*/
 #container {

@@ -11,7 +11,7 @@
 #
 
 class Stream < ActiveRecord::Base
-  attr_accessible :last_used, :name, :current_song_time
+  attr_accessible :last_used, :name, :current_song_time	
 
   has_many :songs, dependent: :destroy
 

@@ -22,6 +22,10 @@ class Song < ActiveRecord::Base
 
   validates_presence_of :stream_id
 
-  has_attached_file :music_file
+  #paperclip_opts = { :storage        => :s3,
+  #                      :s3_credentials => "#{RAILS_ROOT}/config/s3.yml",
+  #                      :bucket         => 'dermis', }
+
+  has_attached_file :music_file #, paperclip_opts
 
 end
