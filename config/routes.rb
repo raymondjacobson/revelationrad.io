@@ -1,4 +1,6 @@
 Revelradio::Application.routes.draw do
+  get "songs/create"
+
   get "streams/new"
 
   get "streams/show"
