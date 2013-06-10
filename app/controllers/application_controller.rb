@@ -6,6 +6,151 @@ class ApplicationController < ActionController::Base
   	@streams = Stream
   end
 
+  def stream_owns_song
+  	@stream = Stream.find(params[:stream_id] || params[:id])
+  end
+
+def getSongData(songURL)
+	i=0
+	local=false
+	test="http"
+	while(i<=3) do
+		if (songURL[i]!=test[i])
+			local=true
+		end
+		i+=1
+	end
+	if(local)
+		getLocalSongData(songURL)
+	else
+		getWebSongData(songURL)
+	end
+end
+
+def getWebSongData(songURL)
+	url="http://developer.echonest.com/api/v4/track/upload"
+	mp3=songURL
+	key="UK5PJDCBCIRVTS6FN"
+	response=Faraday.post do |req|
+	  req.url url
+	  req.body={"api_key"=>key,
+	  "url"=>mp3
+	  }
+	end
+	return parseResults(response,key)
+end
+
+def getLocalSongData(songURL)
+	url="http://developer.echonest.com/api/v4/track/upload"
+
+	tempArray=songURL.split('.')
+	extension=tempArray[tempArray.length-1]
+	extension=extension[0..3]
+
+	puts extension
+	key="UK5PJDCBCIRVTS6FN"
+
+	puts "getting local song file"
+	response=RestClient.post(url, 
+	:track => File.new(songURL),
+	:api_key=>key,
+	:filetype=>extension
+	)
+	puts response.body
+	return parseResults(response,key)
+
+end
+
+def parseResults(response,key)
+	puts response.body
+	response=response.body.delete('"')
+	response=response.gsub(':', ',')
+	responseArray=response.split(",")
+	i=0
+	title=""
+	artist=""
+	md5=""
+
+	while(i<responseArray.length) do
+		responseArray[i]=responseArray[i].strip()
+	  if(responseArray[i]=='title')
+	    i+=1
+	    title=responseArray[i]
+	  end
+	  if(responseArray[i]=='artist_name' || responseArray[i]=='artist')
+	    if(artist=="")
+	      i+=1
+	      artist=responseArray[i]
+	  	end
+	  end
+	  i+=1
+	end
+	puts responseArray
+
+	artist=artist.strip()
+	title=title.strip()
+
+
+	puts artist
+	puts title
+
+	x = title
+	while x.gsub!(/\([^()]*\)/,""); end
+	puts x
+	x=x.strip()
+
+
+	request="http://developer.echonest.com/api/v4/song/search?"
+	keyLink="api_key="+key+"&"
+	#artistLink="artist="+artist+"&"
+	#titleLink="title="+x+"&"
+	artistLink="artist="+artist.gsub(' ','%20')+"&"
+	titleLink="title="+x.gsub(' ','%20')+"&"
+	resultsLink="results=1&"
+	bucketLink="bucket=id:7digital-US&"
+	bucketLink2="bucket=tracks&"
+	formatLink="format=json"
+
+	request+=keyLink
+	request+=artistLink
+	request+=titleLink
+	request+=resultsLink
+	request+=bucketLink
+	request+=bucketLink2
+	request+=formatLink
+
+	file = open(request)
+	response2 = file.read
+
+	puts response2
+	puts request
+
+	response2=response2.delete('"')
+	response2=response2.gsub(': ', ',')
+	responseArray2=response2.split(',')
+	i=0
+	release_image=''
+
+	while(i<responseArray2.length) do
+	  if(responseArray2[i]=='[{release_image')
+	    i+=1
+	    release_image=responseArray2[i]
+	    break
+	  end
+	  i+=1
+	end
+	puts release_image
+	if(release_image=='')
+	  release_image="/assets/record.png"
+	end
+	puts release_image
+	return_vals = {"artists" => artist,
+	               "release_image" => release_image,
+	               "title" => title
+	              }
+	return return_vals
+end
+
 	def get_unique_name(id, streams)
 		r = Random.new
 		nine_digit = r.rand(0..1000000000).to_s
