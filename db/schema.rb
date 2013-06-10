@@ -11,18 +11,27 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130608165324) do
+ActiveRecord::Schema.define(:version => 20130609072132) do
 
   create_table "songs", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",              :null => false
+    t.datetime "updated_at",              :null => false
+    t.integer  "stream_id"
+    t.string   "song_name"
+    t.string   "artist_name"
+    t.string   "art_link"
+    t.string   "music_file_file_name"
+    t.string   "music_file_content_type"
+    t.integer  "music_file_file_size"
+    t.datetime "music_file_updated_at"
   end
 
   create_table "streams", :force => true do |t|
     t.string   "name"
     t.datetime "last_used"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+    t.integer  "current_song_time"
   end
 
 end

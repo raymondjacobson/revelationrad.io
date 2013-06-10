@@ -19,4 +19,5 @@ module ApplicationHelper
   def make_link_with_name(name)
   	return "/" + name
   end
+
 end

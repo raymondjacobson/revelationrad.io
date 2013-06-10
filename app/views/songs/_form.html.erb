@@ -1,0 +1,9 @@
+<%= form_for [@stream, @song], :html => { :multipart => true, :id => "my-awesome-dropzone", :class => "dropzone" } do |f| %>
+	<p><%=f.submit "submit"%></p>
+<% end %>
+<script type="text/javascript">
+	$('#upload_box input').change(function(){
+		alert('asdf');
+		window.location.reload();
+	})
+</script>
