@@ -10,6 +10,10 @@ group :development do
 		gem 'annotate'
 end
 
+group :production do
+		gem 'pg', "~> 0.15.1"
+end
+
 gem 'json'
 
 # Gems used only for assets and not required
