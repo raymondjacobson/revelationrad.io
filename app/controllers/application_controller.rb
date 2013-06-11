@@ -9,10 +9,6 @@ class ApplicationController < ActionController::Base
   def stream_owns_song
   	@stream = Stream.find(params[:stream_id] || params[:id])
   end
-require 'faraday'
-require 'rest-client'
-require 'open-uri'
-require 'json'
 
 def getSongData(songURL)
 	i=0
@@ -40,7 +36,7 @@ def getWebSongData(songURL)
 	  req.body={"api_key"=>key,
 	  "url"=>mp3
 	  }
-	end
+end
 
 	return parseResults(response,key)
 end
@@ -119,8 +115,6 @@ def parseResults(response,key)
 	               "album" => album,
 	               "track_download_url" =>track_download_url
 	              }
-
-
 	return return_vals
 
 end
