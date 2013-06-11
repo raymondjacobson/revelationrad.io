@@ -57,8 +57,11 @@
   	.done(function(data) {
   		console.log(data);
   		$('#track').text(data['title']);
-  		$('#artist').text(data['artists']);
+  		$('#artist').text(data['artist']);
   		$('#song_artwork').attr("src",data['release_image']);
+  		$('#album').text(data['album_name']);
+  		$('#track_download_url').text(data['track_download_url']);
+
   	});
 
   	var int=self.setInterval(function(){

@@ -9,6 +9,10 @@ class ApplicationController < ActionController::Base
   def stream_owns_song
   	@stream = Stream.find(params[:stream_id] || params[:id])
   end
+require 'faraday'
+require 'rest-client'
+require 'open-uri'
+require 'json'
 
 def getSongData(songURL)
 	i=0
@@ -37,6 +41,7 @@ def getWebSongData(songURL)
 	  "url"=>mp3
 	  }
 	end
+
 	return parseResults(response,key)
 end
 
@@ -62,33 +67,12 @@ def getLocalSongData(songURL)
 end
 
 def parseResults(response,key)
-	puts response.body
-	response=response.body.delete('"')
-	response=response.gsub(':', ',')
-	responseArray=response.split(",")
-	i=0
-	title=""
-	artist=""
-	md5=""
+	parsed_json = JSON.parse(response.body)
 
-	while(i<responseArray.length) do
-		responseArray[i]=responseArray[i].strip()
-	  if(responseArray[i]=='title')
-	    i+=1
-	    title=responseArray[i]
-	  end
-	  if(responseArray[i]=='artist_name' || responseArray[i]=='artist')
-	    if(artist=="")
-	      i+=1
-	      artist=responseArray[i]
-	  	end
-	  end
-	  i+=1
-	end
-	puts responseArray
 
-	artist=artist.strip()
-	title=title.strip()
+
+	artist=parsed_json["response"]["track"]["artist"].strip()
+	title=parsed_json["response"]["track"]["title"].strip()
 
 
 	puts artist
@@ -97,58 +81,50 @@ def parseResults(response,key)
 	x = title
 	while x.gsub!(/\([^()]*\)/,""); end
 	puts x
-	x=x.strip()
+	titleSearch=x.strip()
 
 
-	request="http://developer.echonest.com/api/v4/song/search?"
-	keyLink="api_key="+key+"&"
-	#artistLink="artist="+artist+"&"
-	#titleLink="title="+x+"&"
-	artistLink="artist="+artist.gsub(' ','%20')+"&"
-	titleLink="title="+x.gsub(' ','%20')+"&"
-	resultsLink="results=1&"
-	bucketLink="bucket=id:7digital-US&"
-	bucketLink2="bucket=tracks&"
-	formatLink="format=json"
+	request="https://itunes.apple.com/search?"
 
-	request+=keyLink
-	request+=artistLink
-	request+=titleLink
-	request+=resultsLink
-	request+=bucketLink
-	request+=bucketLink2
-	request+=formatLink
+	
+	termLink="term="+artist.gsub(' ','+')+"+"+titleSearch.gsub(' ','+')+"&"
+	limitLink="limit=1&"
+	entityLink="entity=song"
+
+
+
+	request+=termLink
+	request+=limitLink
+	request+=entityLink
+
+
 
 	file = open(request)
-	response2 = file.read
 
-	puts response2
-	puts request
+	result=JSON.parse(file.read)["results"][0]
 
-	response2=response2.delete('"')
-	response2=response2.gsub(': ', ',')
-	responseArray2=response2.split(',')
-	i=0
-	release_image=''
 
-	while(i<responseArray2.length) do
-	  if(responseArray2[i]=='[{release_image')
-	    i+=1
-	    release_image=responseArray2[i]
-	    break
-	  end
-	  i+=1
-	end
-	puts release_image
-	if(release_image=='')
-	  release_image="/assets/record.png"
-	end
-	puts release_image
+	album=result["collectionName"]
+	puts album
+
+	album_art=result['artworkUrl100']
+	puts album_art
+
+	track_download_url=result['trackViewUrl']
+	puts track_download_url
+
 	return_vals = {"artists" => artist,
-	               "release_image" => release_image,
-	               "title" => title
+	               "release_image" => album_art,
+	               "title" => title,
+	               "album" => album,
+	               "track_download_url" =>track_download_url
 	              }
+
+	fJson = File.open("output.txt","w")
+	fJson.write(return_vals)
+	fJson.close
 	return return_vals
+
 end
 
 	def get_unique_name(id, streams)
