@@ -9,121 +9,117 @@ class ApplicationController < ActionController::Base
   def stream_owns_song
   	@stream = Stream.find(params[:stream_id] || params[:id])
   end
-require 'faraday'
-require 'rest-client'
-require 'open-uri'
-require 'json'
 
-def getSongData(songURL)
-	i=0
-	local=false
-	test="http"
-	while(i<=3) do
-		if (songURL[i]!=test[i])
-			local=true
+	def getSongData(songURL)
+		i=0
+		local=false
+		test="http"
+		while(i<=3) do
+			if (songURL[i]!=test[i])
+				local=true
+			end
+			i+=1
 		end
-		i+=1
-	end
-	if(local)
-		getLocalSongData(songURL)
-	else
-		getWebSongData(songURL)
-	end
-end
-
-def getWebSongData(songURL)
-	url="http://developer.echonest.com/api/v4/track/upload"
-	mp3=songURL
-	key="UK5PJDCBCIRVTS6FN"
-	response=Faraday.post do |req|
-	  req.url url
-	  req.body={"api_key"=>key,
-	  "url"=>mp3
-	  }
+		if(local)
+			getLocalSongData(songURL)
+		else
+			getWebSongData(songURL)
+		end
 	end
 
-	return parseResults(response,key)
-end
+	def getWebSongData(songURL)
+		url="http://developer.echonest.com/api/v4/track/upload"
+		mp3=songURL
+		key="UK5PJDCBCIRVTS6FN"
+		response=Faraday.post do |req|
+		  req.url url
+		  req.body={"api_key"=>key,
+		  "url"=>mp3
+		  }
+		end
 
-def getLocalSongData(songURL)
-	url="http://developer.echonest.com/api/v4/track/upload"
+		return parseResults(response,key)
+	end
 
-	tempArray=songURL.split('.')
-	extension=tempArray[tempArray.length-1]
-	extension=extension[0..3]
+	def getLocalSongData(songURL)
+		url="http://developer.echonest.com/api/v4/track/upload"
 
-	puts extension
-	key="UK5PJDCBCIRVTS6FN"
+		tempArray=songURL.split('.')
+		extension=tempArray[tempArray.length-1]
+		extension=extension[0..3]
 
-	puts "getting local song file"
-	response=RestClient.post(url, 
-	:track => File.new(songURL),
-	:api_key=>key,
-	:filetype=>extension
-	)
-	puts response.body
-	return parseResults(response,key)
+		puts extension
+		key="UK5PJDCBCIRVTS6FN"
 
-end
+		puts "getting local song file"
+		response=RestClient.post(url, 
+		:track => File.new(songURL),
+		:api_key=>key,
+		:filetype=>extension
+		)
+		puts response.body
+		return parseResults(response,key)
 
-def parseResults(response,key)
-	parsed_json = JSON.parse(response.body)
+	end
 
-
-
-	artist=parsed_json["response"]["track"]["artist"].strip()
-	title=parsed_json["response"]["track"]["title"].strip()
-
-
-	puts artist
-	puts title
-
-	x = title
-	while x.gsub!(/\([^()]*\)/,""); end
-	puts x
-	titleSearch=x.strip()
-
-
-	request="https://itunes.apple.com/search?"
-
-	
-	termLink="term="+artist.gsub(' ','+')+"+"+titleSearch.gsub(' ','+')+"&"
-	limitLink="limit=1&"
-	entityLink="entity=song"
+	def parseResults(response,key)
+		parsed_json = JSON.parse(response.body)
 
 
 
-	request+=termLink
-	request+=limitLink
-	request+=entityLink
+		artist=parsed_json["response"]["track"]["artist"].strip()
+		title=parsed_json["response"]["track"]["title"].strip()
+
+
+		puts artist
+		puts title
+
+		x = title
+		while x.gsub!(/\([^()]*\)/,""); end
+		puts x
+		titleSearch=x.strip()
+
+
+		request="https://itunes.apple.com/search?"
+
+		
+		termLink="term="+artist.gsub(' ','+')+"+"+titleSearch.gsub(' ','+')+"&"
+		limitLink="limit=1&"
+		entityLink="entity=song"
 
 
 
-	file = open(request)
-
-	result=JSON.parse(file.read)["results"][0]
-
-
-	album=result["collectionName"]
-	puts album
-
-	album_art=result['artworkUrl100']
-	puts album_art
-
-	track_download_url=result['trackViewUrl']
-	puts track_download_url
-
-	return_vals = {"artists" => artist,
-	               "release_image" => album_art,
-	               "title" => title,
-	               "album" => album,
-	               "track_download_url" =>track_download_url
-	              }
+		request+=termLink
+		request+=limitLink
+		request+=entityLink
 
 
-	return return_vals
 
-end
+		file = open(request)
+
+		result=JSON.parse(file.read)["results"][0]
+
+
+		album=result["collectionName"]
+		puts album
+
+		album_art=result['artworkUrl100']
+		puts album_art
+
+		track_download_url=result['trackViewUrl']
+		puts track_download_url
+
+		return_vals = {"artists" => artist,
+		               "release_image" => album_art,
+		               "title" => title,
+		               "album" => album,
+		               "track_download_url" =>track_download_url
+		              }
+
+
+		return return_vals
+
+	end
 
 	def get_unique_name(id, streams)
 		r = Random.new
