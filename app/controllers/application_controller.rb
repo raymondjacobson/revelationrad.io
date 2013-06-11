@@ -120,9 +120,7 @@ def parseResults(response,key)
 	               "track_download_url" =>track_download_url
 	              }
 
-	fJson = File.open("output.txt","w")
-	fJson.write(return_vals)
-	fJson.close
+
 	return return_vals
 
 end
