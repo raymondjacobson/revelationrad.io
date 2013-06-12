@@ -103,20 +103,65 @@ def parseResults(response,key)
 	album=result["collectionName"]
 	puts album
 
-	album_art=result['artworkUrl100']
-	puts album_art
-
 	track_download_url=result['trackViewUrl']
 	puts track_download_url
 
+
+	requestResults=5
+	request="http://developer.echonest.com/api/v4/song/search?"
+	keyLink="api_key="+key+"&"
+	bucketLink="bucket=id:7digital-US&"
+	bucketLink2="bucket=tracks&"
+	formatLink="format=json&"
+	artistLink="artist="+artist.gsub(' ','%20')+"&"
+	titleLink="title="+titleSearch.gsub(' ','%20')+"&"
+	resultsLink="results="+requestResults.to_s()
+
+	request+=keyLink
+	request+=bucketLink
+	request+=bucketLink2
+	request+=formatLink
+	request+=artistLink
+	request+=titleLink
+	request+=resultsLink
+	puts request
+
+	file = open(request)
+	response3 = file.read
+	puts response3
+	response3=JSON.parse(response3)
+	album_art=0
+
+	found_art=false
+	i=0
+
+	while (i<requestResults&&  !found_art)
+		itemToCheck=response3["response"]["songs"][i]["tracks"]
+		if !(itemToCheck.nil?)
+			j=0
+			while(j<itemToCheck.length)
+				if itemToCheck[j]["release_image"]!=""
+					album_art=itemToCheck[j]["release_image"]
+					found_art=true;
+				end
+				j+=1
+			end
+		end
+		i=i+1		
+	end
+
+
 	return_vals = {"artists" => artist,
-	               "release_image" => album_art,
-	               "title" => title,
-	               "album" => album,
-	               "track_download_url" =>track_download_url
-	              }
+       "release_image" => album_art,
+       "title" => title,
+       "album" => album,
+       "track_download_url" =>track_download_url
+	}
 
 
+	fJson = File.open("output.txt","w")
+	fJson.write(return_vals)
+	fJson.close
 	return return_vals
 
 end
